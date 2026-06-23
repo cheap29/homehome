@@ -158,11 +158,11 @@ class AppRepository(
 
     fun observeHistory(): Flow<List<ReflectionSessionEntity>> = sessionDao.observeClosedSessions()
 
+    fun observeSessionById(sessionId: Long): Flow<ReflectionSessionEntity?> =
+        sessionDao.observeSessionById(sessionId)
+
     fun observeHistoryDetail(sessionId: Long): Flow<List<ReflectionResultEntity>> =
         resultDao.observeResultsBySessionId(sessionId)
-
-    suspend fun getSessionById(sessionId: Long): ReflectionSessionEntity? =
-        sessionDao.getOpenSession() // ヒストリー詳細は別クエリで対応
 
     // ── ほめコメント生成 ──────────────────────────────────
     fun buildPraiseText(checkedCount: Int, totalPlan: Int, bonusCount: Int): String = when {
