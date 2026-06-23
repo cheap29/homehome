@@ -1,0 +1,1 @@
+-keep class com.homehome.app.data.db.entity.** { *; }
