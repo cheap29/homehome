@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- placeholder: ホーム用キャラクター。手描き画像に差し替え予定 -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="100dp"
+    android:height="100dp"
+    android:viewportWidth="100"
+    android:viewportHeight="100">
+    <path android:fillColor="#D0BCFF" android:pathData="M50,50m-40,0a40,40 0,1 1,80 0a40,40 0,1 1,-80 0" />
+    <path android:fillColor="#FFFFFF" android:pathData="M35,42 Q50,55 65,42" android:strokeColor="#6650A4" android:strokeWidth="3" android:strokeLineCap="round"/>
+    <path android:fillColor="#6650A4" android:pathData="M38,36 Q40,32 44,36" />
+    <path android:fillColor="#6650A4" android:pathData="M56,36 Q58,32 62,36" />
+</vector>
