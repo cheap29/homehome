@@ -34,13 +34,11 @@ class ReflectionCompleteViewModel(
     init {
         viewModelScope.launch {
             repository.observeHistoryDetail(sessionId).collect { results ->
-                // セッション情報はhisotry経由で取得
                 _state.value = _state.value.copy(results = results)
             }
         }
         viewModelScope.launch {
-            repository.observeHistory().collect { sessions ->
-                val session = sessions.firstOrNull { it.id == sessionId }
+            repository.observeSessionById(sessionId).collect { session ->
                 _state.value = _state.value.copy(session = session)
             }
         }

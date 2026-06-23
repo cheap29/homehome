@@ -21,67 +21,68 @@ fun ReflectionCompleteScreen(
     onNavigateToHome: () -> Unit
 ) {
     val state by viewModel.state.collectAsState()
-
     val imageRes = resolveCharacterImage(state)
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .verticalScroll(rememberScrollState())
-            .padding(horizontal = 24.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Spacer(Modifier.height(32.dp))
-
-        CharacterMessageCard(
-            imageRes = imageRes,
-            message = state.praiseText,
-            imageSize = 160.dp
-        )
-
-        Spacer(Modifier.height(24.dp))
-
-        // スコアカード
-        ElevatedCard(modifier = Modifier.fillMaxWidth()) {
-            Column(
-                modifier = Modifier.padding(24.dp),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                ScoreRow("約束できたこと", state.checkedCount)
-                ScoreRow("ボーナス", state.bonusCount)
-                HorizontalDivider()
-                ScoreRow("合計できたこと", state.totalCount, highlight = true)
-            }
-        }
-
-        Spacer(Modifier.height(32.dp))
-
-        Text(
-            "今日もちゃんと前に進んだね",
-            style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-            textAlign = TextAlign.Center
-        )
-
-        Spacer(Modifier.height(24.dp))
-
-        Button(
-            onClick = onNavigateToSelectThree,
+    Scaffold { padding ->
+        Column(
             modifier = Modifier
-                .fillMaxWidth()
-                .height(56.dp)
+                .fillMaxSize()
+                .padding(padding)
+                .verticalScroll(rememberScrollState())
+                .padding(horizontal = 24.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text("次の3つを決める")
+            Spacer(Modifier.height(32.dp))
+
+            CharacterMessageCard(
+                imageRes = imageRes,
+                message = state.praiseText,
+                imageSize = 160.dp
+            )
+
+            Spacer(Modifier.height(24.dp))
+
+            ElevatedCard(modifier = Modifier.fillMaxWidth()) {
+                Column(
+                    modifier = Modifier.padding(24.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    ScoreRow("約束できたこと", state.checkedCount)
+                    ScoreRow("ボーナス", state.bonusCount)
+                    HorizontalDivider()
+                    ScoreRow("合計できたこと", state.totalCount, highlight = true)
+                }
+            }
+
+            Spacer(Modifier.height(32.dp))
+
+            Text(
+                "今日もちゃんと前に進んだね",
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                textAlign = TextAlign.Center
+            )
+
+            Spacer(Modifier.height(24.dp))
+
+            Button(
+                onClick = onNavigateToSelectThree,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(56.dp)
+            ) {
+                Text("次の3つを決める")
+            }
+
+            Spacer(Modifier.height(8.dp))
+
+            TextButton(onClick = onNavigateToHome) {
+                Text("ホームへもどる")
+            }
+
+            Spacer(Modifier.height(32.dp))
         }
-
-        Spacer(Modifier.height(8.dp))
-
-        TextButton(onClick = onNavigateToHome) {
-            Text("ホームへもどる")
-        }
-
-        Spacer(Modifier.height(32.dp))
     }
 }
 

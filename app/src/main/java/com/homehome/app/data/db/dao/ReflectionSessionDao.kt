@@ -20,4 +20,7 @@ interface ReflectionSessionDao {
 
     @Query("SELECT * FROM reflection_sessions WHERE closedAt IS NOT NULL ORDER BY closedAt DESC")
     fun observeClosedSessions(): Flow<List<ReflectionSessionEntity>>
+
+    @Query("SELECT * FROM reflection_sessions WHERE id = :id LIMIT 1")
+    fun observeSessionById(id: Long): Flow<ReflectionSessionEntity?>
 }

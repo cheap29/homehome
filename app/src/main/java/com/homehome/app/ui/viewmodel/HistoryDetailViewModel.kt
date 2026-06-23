@@ -34,8 +34,7 @@ class HistoryDetailViewModel(
             }
         }
         viewModelScope.launch {
-            repository.observeHistory().collect { sessions ->
-                val session = sessions.firstOrNull { it.id == sessionId }
+            repository.observeSessionById(sessionId).collect { session ->
                 _state.value = _state.value.copy(session = session)
             }
         }
