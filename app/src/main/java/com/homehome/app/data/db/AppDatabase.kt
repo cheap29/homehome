@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
+import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 import com.homehome.app.data.db.dao.*
 import com.homehome.app.data.db.entity.*
@@ -17,9 +18,10 @@ import kotlinx.coroutines.launch
         HabitWordEntity::class,
         ReflectionSessionEntity::class,
         DailyPlanItemEntity::class,
-        ReflectionResultEntity::class
+        ReflectionResultEntity::class,
+        UserStatsEntity::class
     ],
-    version = 1,
+    version = 2,
     exportSchema = false
 )
 abstract class AppDatabase : RoomDatabase() {
@@ -28,9 +30,27 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun reflectionSessionDao(): ReflectionSessionDao
     abstract fun dailyPlanDao(): DailyPlanDao
     abstract fun reflectionResultDao(): ReflectionResultDao
+    abstract fun userStatsDao(): UserStatsDao
 
     companion object {
         @Volatile private var INSTANCE: AppDatabase? = null
+
+        private val MIGRATION_1_2 = object : Migration(1, 2) {
+            override fun migrate(database: SupportSQLiteDatabase) {
+                database.execSQL(
+                    """CREATE TABLE IF NOT EXISTS user_stats (
+                        id INTEGER NOT NULL PRIMARY KEY,
+                        praise INTEGER NOT NULL DEFAULT 0,
+                        praiseMedium INTEGER NOT NULL DEFAULT 0,
+                        praiseLarge INTEGER NOT NULL DEFAULT 0,
+                        praiseSuper INTEGER NOT NULL DEFAULT 0
+                    )"""
+                )
+                database.execSQL(
+                    "INSERT INTO user_stats (id, praise, praiseMedium, praiseLarge, praiseSuper) VALUES (1, 0, 0, 0, 0)"
+                )
+            }
+        }
 
         fun getInstance(context: Context): AppDatabase =
             INSTANCE ?: synchronized(this) {
@@ -39,6 +59,7 @@ abstract class AppDatabase : RoomDatabase() {
 
         private fun buildDatabase(context: Context): AppDatabase =
             Room.databaseBuilder(context, AppDatabase::class.java, "homehome.db")
+                .addMigrations(MIGRATION_1_2)
                 .addCallback(object : Callback() {
                     override fun onCreate(db: SupportSQLiteDatabase) {
                         super.onCreate(db)
@@ -61,6 +82,7 @@ abstract class AppDatabase : RoomDatabase() {
                 db.habitWordDao().insertHabitWord(HabitWordEntity(title = title))
             }
             db.reflectionSessionDao().insertSession(ReflectionSessionEntity())
+            db.userStatsDao().upsert(UserStatsEntity())
         }
     }
 }

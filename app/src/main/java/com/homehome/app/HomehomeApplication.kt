@@ -12,7 +12,8 @@ class HomehomeApplication : Application() {
             habitWordDao = db.habitWordDao(),
             sessionDao = db.reflectionSessionDao(),
             planDao = db.dailyPlanDao(),
-            resultDao = db.reflectionResultDao()
+            resultDao = db.reflectionResultDao(),
+            userStatsDao = db.userStatsDao()
         )
     }
 }

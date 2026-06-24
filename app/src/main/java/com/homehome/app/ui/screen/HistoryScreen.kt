@@ -5,6 +5,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Science
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -25,7 +26,8 @@ import java.util.Locale
 fun HistoryScreen(
     viewModel: HistoryViewModel,
     onBack: () -> Unit,
-    onDetail: (Long) -> Unit
+    onDetail: (Long) -> Unit,
+    onNavigateToPraiseVault: () -> Unit
 ) {
     val sessions by viewModel.sessions.collectAsState()
     val dateFormat = SimpleDateFormat("yyyy/MM/dd HH:mm", Locale.JAPAN)
@@ -37,6 +39,11 @@ fun HistoryScreen(
                 navigationIcon = {
                     IconButton(onClick = onBack) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, "もどる")
+                    }
+                },
+                actions = {
+                    IconButton(onClick = onNavigateToPraiseVault) {
+                        Icon(Icons.Default.Science, contentDescription = "ほめほめビーカー", tint = MaterialTheme.colorScheme.primary)
                     }
                 }
             )

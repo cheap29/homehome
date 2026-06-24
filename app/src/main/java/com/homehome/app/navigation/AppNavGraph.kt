@@ -20,6 +20,8 @@ object Routes {
     const val REFLECTION_COMPLETE = "reflection_complete/{sessionId}"
     const val HISTORY = "history"
     const val HISTORY_DETAIL = "history_detail/{sessionId}"
+    const val PRAISE_VAULT = "praise_vault"
+    const val PRAISE_FOREST = "praise_forest"
 
     fun reflectionComplete(sessionId: Long) = "reflection_complete/$sessionId"
     fun historyDetail(sessionId: Long) = "history_detail/$sessionId"
@@ -40,32 +42,24 @@ fun AppNavGraph(
                 onNavigateToReflection = { navController.navigate(Routes.REFLECTION) },
                 onNavigateToTaskBox = { navController.navigate(Routes.TASK_BOX) },
                 onNavigateToHabitWords = { navController.navigate(Routes.HABIT_WORDS) },
-                onNavigateToHistory = { navController.navigate(Routes.HISTORY) }
+                onNavigateToHistory = { navController.navigate(Routes.HISTORY) },
+                onNavigateToPraiseVault = { navController.navigate(Routes.PRAISE_VAULT) }
             )
         }
 
         composable(Routes.TASK_BOX) {
             val vm: TaskBoxViewModel = viewModel(factory = TaskBoxViewModel.Factory(repository))
-            TaskBoxScreen(
-                viewModel = vm,
-                onBack = { navController.popBackStack() }
-            )
+            TaskBoxScreen(viewModel = vm, onBack = { navController.popBackStack() })
         }
 
         composable(Routes.HABIT_WORDS) {
             val vm: HabitWordsViewModel = viewModel(factory = HabitWordsViewModel.Factory(repository))
-            HabitWordsScreen(
-                viewModel = vm,
-                onBack = { navController.popBackStack() }
-            )
+            HabitWordsScreen(viewModel = vm, onBack = { navController.popBackStack() })
         }
 
         composable(Routes.SELECT_THREE) {
             val vm: SelectThreeViewModel = viewModel(factory = SelectThreeViewModel.Factory(repository))
-            SelectThreeScreen(
-                viewModel = vm,
-                onBack = { navController.popBackStack() }
-            )
+            SelectThreeScreen(viewModel = vm, onBack = { navController.popBackStack() })
         }
 
         composable(Routes.REFLECTION) {
@@ -92,14 +86,10 @@ fun AppNavGraph(
             ReflectionCompleteScreen(
                 viewModel = vm,
                 onNavigateToSelectThree = {
-                    navController.navigate(Routes.SELECT_THREE) {
-                        popUpTo(Routes.HOME)
-                    }
+                    navController.navigate(Routes.SELECT_THREE) { popUpTo(Routes.HOME) }
                 },
                 onNavigateToHome = {
-                    navController.navigate(Routes.HOME) {
-                        popUpTo(Routes.HOME) { inclusive = true }
-                    }
+                    navController.navigate(Routes.HOME) { popUpTo(Routes.HOME) { inclusive = true } }
                 }
             )
         }
@@ -109,7 +99,8 @@ fun AppNavGraph(
             HistoryScreen(
                 viewModel = vm,
                 onBack = { navController.popBackStack() },
-                onDetail = { sessionId -> navController.navigate(Routes.historyDetail(sessionId)) }
+                onDetail = { sessionId -> navController.navigate(Routes.historyDetail(sessionId)) },
+                onNavigateToPraiseVault = { navController.navigate(Routes.PRAISE_VAULT) }
             )
         }
 
@@ -121,10 +112,20 @@ fun AppNavGraph(
             val vm: HistoryDetailViewModel = viewModel(
                 factory = HistoryDetailViewModel.Factory(repository, sessionId)
             )
-            HistoryDetailScreen(
+            HistoryDetailScreen(viewModel = vm, onBack = { navController.popBackStack() })
+        }
+
+        composable(Routes.PRAISE_VAULT) {
+            val vm: PraiseVaultViewModel = viewModel(factory = PraiseVaultViewModel.Factory(repository))
+            PraiseVaultScreen(
                 viewModel = vm,
-                onBack = { navController.popBackStack() }
+                onBack = { navController.popBackStack() },
+                onNavigateToForest = { navController.navigate(Routes.PRAISE_FOREST) }
             )
+        }
+
+        composable(Routes.PRAISE_FOREST) {
+            PraiseForestScreen(onBack = { navController.popBackStack() })
         }
     }
 }
