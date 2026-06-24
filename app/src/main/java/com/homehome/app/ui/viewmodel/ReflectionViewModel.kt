@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.homehome.app.data.db.entity.DailyPlanItemEntity
 import com.homehome.app.data.db.entity.ReflectionResultEntity
+import com.homehome.app.data.db.entity.SourceType
 import com.homehome.app.data.db.entity.TaskEntity
 import com.homehome.app.data.repository.AppRepository
 import com.homehome.app.data.repository.HomeState
@@ -52,7 +53,7 @@ class ReflectionViewModel(private val repository: AppRepository) : ViewModel() {
     fun addBonusFromTask(task: TaskEntity) {
         val session = homeState.value.session ?: return
         viewModelScope.launch {
-            repository.addBonusResult(session.id, task.title, "TASK", task.id)
+            repository.addBonusResult(session.id, task.title, SourceType.TASK, task.id)
             _showBonusSheet.value = false
         }
     }
@@ -60,7 +61,7 @@ class ReflectionViewModel(private val repository: AppRepository) : ViewModel() {
     fun addBonusFree(title: String) {
         val session = homeState.value.session ?: return
         viewModelScope.launch {
-            repository.addBonusResult(session.id, title, "FREE", null)
+            repository.addBonusResult(session.id, title, SourceType.FREE, null)
             _showBonusSheet.value = false
         }
     }

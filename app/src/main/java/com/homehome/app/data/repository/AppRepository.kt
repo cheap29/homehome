@@ -16,7 +16,7 @@ data class HomeState(
 data class SelectableItem(
     val id: Long,
     val title: String,
-    val sourceType: String,
+    val sourceType: SourceType,
     val sourceId: Long
 )
 
@@ -94,8 +94,8 @@ class AppRepository(
 
     fun observeSelectableItems(): Flow<List<SelectableItem>> =
         habitWordDao.observeHabitWords().combine(taskDao.observeActiveTasks()) { habits, tasks ->
-            val habitItems = habits.map { SelectableItem(it.id, it.title, "HABIT", it.id) }
-            val taskItems = tasks.map { SelectableItem(it.id, it.title, "TASK", it.id) }
+            val habitItems = habits.map { SelectableItem(it.id, it.title, SourceType.HABIT, it.id) }
+            val taskItems = tasks.map { SelectableItem(it.id, it.title, SourceType.TASK, it.id) }
             habitItems + taskItems
         }
 
@@ -113,7 +113,7 @@ class AppRepository(
         sessionDao.insertSession(ReflectionSessionEntity())
 
     // ── 振り返り ────────────────────────────────────────
-    suspend fun addBonusResult(sessionId: Long, title: String, sourceType: String, sourceId: Long?) {
+    suspend fun addBonusResult(sessionId: Long, title: String, sourceType: SourceType, sourceId: Long?) {
         val result = ReflectionResultEntity(
             sessionId = sessionId,
             titleSnapshot = title,
@@ -123,7 +123,7 @@ class AppRepository(
             isCompleted = true
         )
         resultDao.insertResults(listOf(result))
-        if (sourceType == "TASK" && sourceId != null) {
+        if (sourceType == SourceType.TASK && sourceId != null) {
             taskDao.markTaskCompleted(sourceId)
         }
     }
@@ -140,7 +140,7 @@ class AppRepository(
             ReflectionResultEntity(
                 sessionId = sessionId,
                 titleSnapshot = item.titleSnapshot,
-                sourceType = "PLAN",
+                sourceType = SourceType.PLAN,
                 sourceId = item.sourceId,
                 isPlanned = true,
                 isCompleted = item.isChecked

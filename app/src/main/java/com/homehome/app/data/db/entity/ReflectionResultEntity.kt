@@ -8,7 +8,7 @@ data class ReflectionResultEntity(
     @PrimaryKey(autoGenerate = true) val id: Long = 0,
     val sessionId: Long,
     val titleSnapshot: String,
-    val sourceType: String, // PLAN, TASK, HABIT, FREE
+    val sourceType: SourceType,
     val sourceId: Long? = null,
     val isPlanned: Boolean,
     val isCompleted: Boolean,

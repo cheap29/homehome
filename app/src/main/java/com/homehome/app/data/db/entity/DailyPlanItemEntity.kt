@@ -7,7 +7,7 @@ import androidx.room.PrimaryKey
 data class DailyPlanItemEntity(
     @PrimaryKey(autoGenerate = true) val id: Long = 0,
     val sessionId: Long,
-    val sourceType: String, // TASK, HABIT, FREE
+    val sourceType: SourceType,
     val sourceId: Long? = null,
     val titleSnapshot: String,
     val orderIndex: Int,

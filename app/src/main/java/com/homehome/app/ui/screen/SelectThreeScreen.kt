@@ -11,6 +11,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.homehome.app.R
+import com.homehome.app.data.db.entity.SourceType
 import com.homehome.app.data.repository.SelectableItem
 import com.homehome.app.ui.component.CharacterMessageCard
 import com.homehome.app.ui.viewmodel.SelectThreeViewModel
@@ -70,8 +71,8 @@ fun SelectThreeScreen(
             }
 
             // 単語帳セクション（フカツさん案：統合リスト、タグで出所を示す）
-            val habitItems = items.filter { it.sourceType == "HABIT" }
-            val taskItems = items.filter { it.sourceType == "TASK" }
+            val habitItems = items.filter { it.sourceType == SourceType.HABIT }
+            val taskItems = items.filter { it.sourceType == SourceType.TASK }
 
             if (habitItems.isNotEmpty()) {
                 item {
