@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- ほめほめビーカー：三角フラスコ -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="100dp"
+    android:height="100dp"
+    android:viewportWidth="100"
+    android:viewportHeight="100">
+
+    <!-- フラスコ本体（水色・半透明） -->
+    <path
+        android:fillColor="#80B3E5FC"
+        android:pathData="M38,20 L62,20 L62,40 Q85,55 85,82 L15,82 Q15,55 38,40 Z" />
+
+    <!-- 液体（パープル） -->
+    <path
+        android:fillColor="#996650A4"
+        android:pathData="M21,60 Q50,70 79,60 L84,82 L16,82 Z" />
+
+    <!-- 首部分 -->
+    <path
+        android:fillColor="#80B3E5FC"
+        android:pathData="M38,6 L62,6 L62,22 L38,22 Z" />
+
+    <!-- フラスコ外枠 -->
+    <path
+        android:fillColor="#00000000"
+        android:strokeColor="#4A90D9"
+        android:strokeWidth="3"
+        android:pathData="M38,20 L62,20 L62,40 Q85,55 85,82 L15,82 Q15,55 38,40 Z" />
+
+    <!-- 首の外枠 -->
+    <path
+        android:fillColor="#00000000"
+        android:strokeColor="#4A90D9"
+        android:strokeWidth="3"
+        android:pathData="M38,6 L38,20" />
+    <path
+        android:fillColor="#00000000"
+        android:strokeColor="#4A90D9"
+        android:strokeWidth="3"
+        android:pathData="M62,6 L62,20" />
+    <path
+        android:fillColor="#00000000"
+        android:strokeColor="#4A90D9"
+        android:strokeWidth="3"
+        android:pathData="M38,6 L62,6" />
+
+    <!-- 光沢 -->
+    <path
+        android:fillColor="#00000000"
+        android:strokeColor="#60FFFFFF"
+        android:strokeWidth="3"
+        android:strokeLineCap="round"
+        android:pathData="M44,28 Q42,45 40,58" />
+
+    <!-- 泡1 -->
+    <path
+        android:fillColor="#80FFFFFF"
+        android:pathData="M55,68 m-4,0 a4,4 0,1 1,8 0 a4,4 0,1 1,-8 0" />
+    <!-- 泡2 -->
+    <path
+        android:fillColor="#60FFFFFF"
+        android:pathData="M65,72 m-3,0 a3,3 0,1 1,6 0 a3,3 0,1 1,-6 0" />
+</vector>

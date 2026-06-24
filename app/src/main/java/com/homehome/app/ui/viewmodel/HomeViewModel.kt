@@ -23,6 +23,13 @@ class HomeViewModel(private val repository: AppRepository) : ViewModel() {
         }
     }
 
+    fun resetPlan() {
+        val session = homeState.value.session ?: return
+        viewModelScope.launch {
+            repository.clearPlanItems(session.id)
+        }
+    }
+
     class Factory(private val repository: AppRepository) : ViewModelProvider.Factory {
         @Suppress("UNCHECKED_CAST")
         override fun <T : ViewModel> create(modelClass: Class<T>): T =

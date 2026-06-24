@@ -6,6 +6,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.map
 
 data class HomeState(
     val session: ReflectionSessionEntity?,
@@ -15,7 +16,7 @@ data class HomeState(
 data class SelectableItem(
     val id: Long,
     val title: String,
-    val sourceType: String, // TASK or HABIT
+    val sourceType: SourceType,
     val sourceId: Long
 )
 
@@ -24,7 +25,8 @@ class AppRepository(
     private val habitWordDao: HabitWordDao,
     private val sessionDao: ReflectionSessionDao,
     private val planDao: DailyPlanDao,
-    private val resultDao: ReflectionResultDao
+    private val resultDao: ReflectionResultDao,
+    private val userStatsDao: UserStatsDao
 ) {
     // ── ホーム ──────────────────────────────────────────
     fun observeHomeState(): Flow<HomeState> =
@@ -86,22 +88,21 @@ class AppRepository(
         planDao.updateChecked(itemId, checked)
     }
 
-    // 単語帳+BOX統合候補リスト（フカツさん案：統合リストでタグで出所を示す）
+    suspend fun clearPlanItems(sessionId: Long) {
+        planDao.deleteBySessionId(sessionId)
+    }
+
     fun observeSelectableItems(): Flow<List<SelectableItem>> =
         habitWordDao.observeHabitWords().combine(taskDao.observeActiveTasks()) { habits, tasks ->
-            val habitItems = habits.map {
-                SelectableItem(it.id, it.title, "HABIT", it.id)
-            }
-            val taskItems = tasks.map {
-                SelectableItem(it.id, it.title, "TASK", it.id)
-            }
+            val habitItems = habits.map { SelectableItem(it.id, it.title, SourceType.HABIT, it.id) }
+            val taskItems = tasks.map { SelectableItem(it.id, it.title, SourceType.TASK, it.id) }
             habitItems + taskItems
         }
 
     // ── セッション ──────────────────────────────────────
     suspend fun getOrCreateOpenSession(): ReflectionSessionEntity {
         return sessionDao.getOpenSession() ?: run {
-            val id = sessionDao.insertSession(ReflectionSessionEntity())
+            sessionDao.insertSession(ReflectionSessionEntity())
             sessionDao.getOpenSession()!!
         }
     }
@@ -112,7 +113,7 @@ class AppRepository(
         sessionDao.insertSession(ReflectionSessionEntity())
 
     // ── 振り返り ────────────────────────────────────────
-    suspend fun addBonusResult(sessionId: Long, title: String, sourceType: String, sourceId: Long?) {
+    suspend fun addBonusResult(sessionId: Long, title: String, sourceType: SourceType, sourceId: Long?) {
         val result = ReflectionResultEntity(
             sessionId = sessionId,
             titleSnapshot = title,
@@ -122,10 +123,13 @@ class AppRepository(
             isCompleted = true
         )
         resultDao.insertResults(listOf(result))
-        if (sourceType == "TASK" && sourceId != null) {
+        if (sourceType == SourceType.TASK && sourceId != null) {
             taskDao.markTaskCompleted(sourceId)
         }
     }
+
+    fun observeBonusResults(sessionId: Long): Flow<List<ReflectionResultEntity>> =
+        resultDao.observeResultsBySessionId(sessionId).map { it.filter { r -> !r.isPlanned } }
 
     suspend fun completeReflection(
         sessionId: Long,
@@ -136,7 +140,7 @@ class AppRepository(
             ReflectionResultEntity(
                 sessionId = sessionId,
                 titleSnapshot = item.titleSnapshot,
-                sourceType = "PLAN",
+                sourceType = SourceType.PLAN,
                 sourceId = item.sourceId,
                 isPlanned = true,
                 isCompleted = item.isChecked
@@ -144,15 +148,16 @@ class AppRepository(
         }
         resultDao.insertResults(results)
 
-        val bonusResults = resultDao.getResultsBySessionId(sessionId)
-            .filter { !it.isPlanned }
+        val bonusResults = resultDao.getResultsBySessionId(sessionId).filter { !it.isPlanned }
         val checkedCount = checkedPlanItems.size
         val bonusCount = bonusResults.size
         val praiseText = buildPraiseText(checkedCount, allPlanItems.size, bonusCount)
 
         sessionDao.closeSession(sessionId, System.currentTimeMillis(), praiseText)
 
-        // 未達成の目標はそのまま（やることBOXには戻さない、持ち越し扱い）
+        val praiseAmount = checkedCount + bonusCount
+        if (praiseAmount > 0) addPraise(praiseAmount)
+
         return praiseText
     }
 
@@ -163,6 +168,31 @@ class AppRepository(
 
     fun observeHistoryDetail(sessionId: Long): Flow<List<ReflectionResultEntity>> =
         resultDao.observeResultsBySessionId(sessionId)
+
+    // ── ほめほめビーカー ──────────────────────────────────
+    fun observeStats(): Flow<UserStatsEntity> =
+        userStatsDao.observeStats().map { it ?: UserStatsEntity() }
+
+    private suspend fun addPraise(amount: Int) {
+        val s = userStatsDao.getStats() ?: UserStatsEntity()
+
+        var praise = s.praise + amount
+        var medium = s.praiseMedium + praise / 10
+        praise %= 10
+        var large = s.praiseLarge + medium / 10
+        medium %= 10
+        val superP = s.praiseSuper + large / 10
+        large %= 10
+
+        userStatsDao.upsert(UserStatsEntity(praise = praise, praiseMedium = medium, praiseLarge = large, praiseSuper = superP))
+    }
+
+    suspend fun consumeSuperPraise(): Boolean {
+        val s = userStatsDao.getStats() ?: return false
+        if (s.praiseSuper <= 0) return false
+        userStatsDao.upsert(s.copy(praiseSuper = s.praiseSuper - 1))
+        return true
+    }
 
     // ── ほめコメント生成 ──────────────────────────────────
     fun buildPraiseText(checkedCount: Int, totalPlan: Int, bonusCount: Int): String = when {
